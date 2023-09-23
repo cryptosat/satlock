@@ -15,22 +15,32 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
 }) => {
-  const ethParentNode = 'EthParentNode';
-
   switch (request.method) {
     case 'getEthParentNode':
-      return snap.request({
-        method: 'snap_dialog',
-        params: {
-          type: 'confirmation',
-          content: panel([
-            text(`Hello, **${origin}**!`),
-            text('This custom confirmation is just for display purposes.'),
-            text(ethParentNode),
-          ]),
-        },
-      });
+      return handleGetEthParentNode(origin);
     default:
       throw new Error('Method not found.');
   }
 };
+
+async function handleGetEthParentNode(origin: string) {
+  const ethParentNode = await snap.request({
+    method: 'snap_getBip44Entropy',
+    params: { coinType: 1 },
+  });
+
+  const approved = snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'confirmation',
+      content: panel([
+        text(`Hello, **${origin}**!`),
+        text(
+          `Would you like to share your entropy with Cryptosat?... ${ethParentNode.privateKey}`
+        ),
+      ]),
+    },
+  });
+
+  return approved;
+}
