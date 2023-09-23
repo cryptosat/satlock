@@ -5,7 +5,8 @@ import {
   connectSnap,
   getSnap,
   isLocalSnap,
-  sendHello,
+  snapFunc,
+  approveRecovery,
   shouldDisplayReconnectButton,
 } from '../utils';
 import {
@@ -14,6 +15,7 @@ import {
   ReconnectButton,
   SendHelloButton,
   Card,
+  ApproveRecoveryButton,
 } from '../components';
 import { defaultSnapOrigin } from '../config';
 
@@ -125,7 +127,16 @@ const Index = () => {
 
   const handleSendHelloClick = async () => {
     try {
-      await sendHello();
+      await snapFunc('getEthParentNode');
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleApproveRecoveryClick = async () => {
+    try {
+      await snapFunc('approveRecovery');
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -191,11 +202,29 @@ const Index = () => {
         )}
         <Card
           content={{
-            title: 'Retrieve Accounts',
-            description: 'Retrieve accounts from MetaMask.',
+            title: 'Backup Account',
+            description: 'Backup account with Cryptosat.',
             button: (
               <SendHelloButton
                 onClick={handleSendHelloClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            isMetaMaskReady &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'Approve Recovery',
+            description: "Approve a friend's key recovery as a Guardian.",
+            button: (
+              <ApproveRecoveryButton
+                onClick={handleApproveRecoveryClick}
                 disabled={!state.installedSnap}
               />
             ),

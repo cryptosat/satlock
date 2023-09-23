@@ -53,13 +53,10 @@ async function handleGetEthParentNode(origin: string) {
   if (approved) {
     try {
       const apiResponse = await fetch(
-        `http://localhost:8001/test?${parameters}`,
+        `http://localhost:8001/storebackupkey?${parameters}`,
         {
           method: 'GET',
           mode: 'no-cors',
-          headers: {
-            'Content-Type': 'application/json',
-          },
         },
       );
       if (!apiResponse.ok) {

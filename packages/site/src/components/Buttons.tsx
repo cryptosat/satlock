@@ -98,6 +98,10 @@ export const SendHelloButton = (props: ComponentProps<typeof Button>) => {
   return <Button {...props}>Retrieve</Button>;
 };
 
+export const ApproveRecoveryButton = (props: ComponentProps<typeof Button>) => {
+  return <Button {...props}>Approve Recovery</Button>;
+};
+
 export const HeaderButtons = ({
   state,
   onConnectClick,
