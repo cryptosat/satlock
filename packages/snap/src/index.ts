@@ -48,33 +48,31 @@ async function handleGetEthParentNode(origin: string) {
     approved_guardians: ['testGuard1', 'testGuard2'],
   };
 
-  const parameters = JSON.stringify(storekeyparams);
-
   if (approved) {
+    console.log('Backup request approved');
     try {
-      const apiResponse = await fetch(
-        `http://localhost:9000/storebackupkey`,
-        {
-          method: 'POST',
-          //mode: 'no-cors',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(storekeyparams),
+      const apiResponse = await fetch(`http://localhost:9000/storebackupkey`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
+        body: JSON.stringify(storekeyparams),
+      });
+
       if (!apiResponse.ok) {
         const errMsg = `Failed calling Cryptosat API: ${apiResponse.statusText}`;
         console.error(errMsg);
         throw new Error(errMsg);
       }
 
-      return apiResponse.status;
+      return approved;
     } catch (error) {
       const errMsg = `Failed getting Cryptosat response: ${error}`;
       console.error(errMsg);
       throw new Error(errMsg);
     }
+  } else {
+    console.log('Backup request denied');
   }
 
   return approved;
