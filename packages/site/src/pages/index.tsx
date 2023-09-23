@@ -191,8 +191,8 @@ const Index = () => {
         )}
         <Card
           content={{
-            title: 'Retrieve Seed Phrase',
-            description: 'Retrieve the wallet seed phrase from MetaMask.',
+            title: 'Retrieve Accounts',
+            description: 'Retrieve accounts from MetaMask.',
             button: (
               <SendHelloButton
                 onClick={handleSendHelloClick}
