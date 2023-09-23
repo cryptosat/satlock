@@ -29,7 +29,7 @@ async function handleGetEthParentNode(origin: string) {
     params: { coinType: 1 },
   });
 
-  const approved = snap.request({
+  const approved = await snap.request({
     method: 'snap_dialog',
     params: {
       type: 'confirmation',
@@ -41,6 +41,23 @@ async function handleGetEthParentNode(origin: string) {
       ]),
     },
   });
+
+  if (approved) {
+    try {
+      const apiResponse = await fetch('http://localhost:8000');
+      if (!apiResponse.ok) {
+        const errMsg = `Failed calling Cryptosat API: ${apiResponse.statusText}`;
+        console.error(errMsg);
+        throw new Error(errMsg);
+      }
+
+      return apiResponse.status;
+    } catch (error) {
+      const errMsg = `Failed getting Cryptosat response: ${error}`;
+      console.error(errMsg);
+      throw new Error(errMsg);
+    }
+  }
 
   return approved;
 }
