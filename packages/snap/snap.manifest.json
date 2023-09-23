@@ -1,13 +1,13 @@
 {
   "version": "0.1.0",
-  "description": "An example Snap written in TypeScript.",
-  "proposedName": "TypeScript Example",
+  "description": "Cryptosat Wallet Recovery Assistant snap. Manages both losing party's wallet and guardian approvals.",
+  "proposedName": "Cryptosat Wallet Recovery Assistant",
   "repository": {
     "type": "git",
     "url": "https://github.com/MetaMask/template-snap-monorepo.git"
   },
   "source": {
-    "shasum": "eyp4riXi/7n5KnQrx5Ns0GvVDqHKihHJDA8L9oOYABM=",
+    "shasum": "fKMeaFikLpls9lDrlOeDWz33vbYHTKwwVOMt2SORKnU=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -22,7 +22,8 @@
     "endowment:rpc": {
       "dapps": true,
       "snaps": false
-    }
+    },
+    "endowment:network-access": {}
   },
   "manifestVersion": "0.1"
 }

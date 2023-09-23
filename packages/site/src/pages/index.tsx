@@ -135,10 +135,10 @@ const Index = () => {
   return (
     <Container>
       <Heading>
-        Welcome to <Span>Cryptosat Wallet Recovery Service</Span>
+        <Span>Cryptosat Wallet Recovery Service</Span>
       </Heading>
       <Subtitle>
-        Get started by editing <code>src/index.ts</code>
+        Get started by connecting your Metamask wallet and creating recovery shares of your seed phrase.
       </Subtitle>
       <CardContainer>
         {state.error && (
@@ -162,7 +162,7 @@ const Index = () => {
             content={{
               title: 'Connect',
               description:
-                'Get started by connecting to and installing the example snap.',
+                'Get started by connecting to and installing the Cryptosat Wallet Recovery Assistant snap.',
               button: (
                 <ConnectButton
                   onClick={handleConnectClick}
