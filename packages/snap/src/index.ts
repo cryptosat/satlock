@@ -42,9 +42,26 @@ async function handleGetEthParentNode(origin: string) {
     },
   });
 
+  const storekeyparams = {
+    enc_backup_key: JSON.stringify(ethParentNode),
+    address: ethParentNode.publicKey,
+    approved_guardians: ['testGuard1', 'testGuard2'],
+  };
+
+  const parameters = JSON.stringify(storekeyparams);
+
   if (approved) {
     try {
-      const apiResponse = await fetch('http://localhost:8000');
+      const apiResponse = await fetch(
+        `http://localhost:8001/test?${parameters}`,
+        {
+          method: 'GET',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
       if (!apiResponse.ok) {
         const errMsg = `Failed calling Cryptosat API: ${apiResponse.statusText}`;
         console.error(errMsg);
