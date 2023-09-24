@@ -1,21 +1,24 @@
 # Guardian Key Recovery Snap
 
-This repository provides a Snap for MetaMask that facilitates Guardian Key Recovery. To get started, follow the steps below.
+This repository offers a MetaMask Snap dedicated to the Guardian Key Recovery process. Developed by CryptoSat for the ETHGlobal NYC Hackathon, it's a demo of what could be possible with a real life satellite integrated system.
 
 ## Local Deployment
-
-Clone the repository [using this template](https://github.com/cryptosat/satlock) and setup the development environment:
+### Front End - This Repository
+Clone the repository and setup the development environment:
 
 ```shell
 cd satlock
 yarn install && yarn start
 ```
 
-### Testing and Linting
+####  Testing and Linting
 
 Run `yarn test` to run the tests once.
 
 Run `yarn lint` to run the linter, or run `yarn lint:fix` to run the linter and fix any automatically fixable issues.
+
+### Backend 
+See the backend [repository](https://github.com/cryptosat/satlock_api)
 
 # Usage 
 ## Guardian Key Recovery Guide
