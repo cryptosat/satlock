@@ -1,4 +1,6 @@
 /* eslint-disable jsdoc/require-jsdoc */
+import { secp256k1 } from 'ethereum-cryptography/secp256k1';
+import { keccak256 } from 'ethereum-cryptography/keccak';
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { panel, text } from '@metamask/snaps-ui';
 
@@ -40,33 +42,58 @@ async function getPublicKey() {
   return entropy.publicKey;
 }
 
+function derivePublicKey(privateKeyHex: string) {
+  // Convert the hex string to a Buffer
+  const privateKeyBuffer: Buffer = Buffer.from(privateKeyHex, 'hex');
+
+  // Derive the public key
+  const publicKeyBuffer: Buffer = Buffer.from(
+    secp256k1.getPublicKey(privateKeyBuffer, false).slice(1).buffer,
+  ); // Remove the first byte (0x04) to get the 64-byte public key
+
+  return publicKeyBuffer;
+}
+
+function deriveEthereumAddress(publicKey: Buffer): string {
+  // Hash the public key
+  const pubKeyHash = keccak256(publicKey); // remove the first byte if it's 0x04
+
+  // Take the last 20 bytes of this hash
+  const addrBuffer: Buffer = Buffer.from(pubKeyHash.slice(-20).buffer);
+
+  // Convert to hex, and make it lowercase because Ethereum addresses are not case-sensitive
+  const address = addrBuffer.toString('hex').toLowerCase();
+
+  return `0x${address}`;
+}
+
 /**
  * Handles a getEthParentNode request to snap.
  *
  * @param origin - Calling host.
  */
 async function handleBackupAccount(origin: string) {
-  const entropy = await snap.request({
-    method: 'snap_getBip44Entropy',
-    params: { coinType: 1 },
-  });
-
-  const approved = await snap.request({
+  const privateKey = await snap.request({
     method: 'snap_dialog',
     params: {
-      type: 'confirmation',
+      type: 'prompt',
       content: panel([
         text(`Hi Potential Key-Loser, **${origin}**!`),
-        text(`Would you like to backup your account with Cryptosat?`),
-        text(`${entropy.publicKey}`),
+        text('Enter the private key you want to backup with Cryptosat'),
       ]),
     },
   });
 
-  if (!approved) {
+  if (!privateKey) {
     console.log('Backup request denied');
     return false;
   }
+
+  console.log('Private key:', privateKey);
+  const publicKey = derivePublicKey(privateKey);
+  const ethAddress: string = deriveEthereumAddress(publicKey);
+  console.log('Public key: ', ethAddress);
+
   const guardians: string[] = [];
   for (let i = 0; i < 2; i++) {
     guardians[i] = await snap.request({
@@ -85,8 +112,8 @@ async function handleBackupAccount(origin: string) {
   }
 
   const storekeyparams = {
-    enc_backup_key: JSON.stringify(entropy),
-    address: entropy.publicKey,
+    enc_backup_key: privateKey,
+    address: ethAddress,
     approved_guardians: guardians,
   };
 
