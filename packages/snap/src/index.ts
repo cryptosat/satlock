@@ -24,7 +24,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     case 'approveRecovery':
       return handleApproveRecovery(origin);
     case 'showGuardianKey':
-      return showGuardianKey(origin);
+      return showGuardianKey();
     default:
       throw new Error('Method not found.');
   }
@@ -184,7 +184,7 @@ async function handleApproveRecovery(origin: string) {
   return approved;
 }
 
-async function showGuardianKey(origin: string) {
+async function showGuardianKey() {
   const parentNode = await snap.request({
     method: 'snap_getBip44Entropy',
     params: { coinType: 1 }, // Bitcoin network
@@ -193,7 +193,7 @@ async function showGuardianKey(origin: string) {
   const guardianKey = await snap.request({
     method: 'snap_dialog',
     params: {
-      type: 'confirmation',
+      type: 'alert',
       content: panel([text(`${parentNode.publicKey}`)]),
     },
   });
