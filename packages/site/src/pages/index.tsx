@@ -206,6 +206,26 @@ const Index = () => {
         )}
         <Card
           content={{
+            title: 'Recovery Instructions',
+            description: (
+              <div>
+                <p>1. Ask your friends for their Guardian Keys.</p>
+                <p>2. Click back up account.</p>
+                <p>
+                  3. If you lost your key, give your friends your address and
+                  ask them to Approve recovery.
+                </p>
+                <p>
+                  4. After enough guardians have approved, click Restore
+                  Account. Import the recovered account into metamask!
+                </p>
+              </div>
+            ),
+          }}
+          fullWidth={true} // set this based on how you want it to appear
+        />
+        <Card
+          content={{
             title: 'Backup Account',
             description: 'Backup account with Cryptosat.',
             button: (
@@ -276,14 +296,6 @@ const Index = () => {
             !shouldDisplayReconnectButton(state.installedSnap)
           }
         />
-        <Notice>
-          <p>
-            Please note that the <b>snap.manifest.json</b> and{' '}
-            <b>package.json</b> must be located in the server root directory and
-            the bundle must be hosted at the location specified by the location
-            field.
-          </p>
-        </Notice>
       </CardContainer>
     </Container>
   );
