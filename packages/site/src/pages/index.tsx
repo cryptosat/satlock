@@ -240,26 +240,8 @@ const Index = () => {
         />
         <Card
           content={{
-            title: 'Backup Account',
-            description: 'Backup account with Cryptosat.',
-            button: (
-              <SendHelloButton
-                onClick={handleSendHelloClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            isMetaMaskReady &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
             title: 'Restore Account',
-            description: 'Backup account with Cryptosat.',
+            description: 'Restore a Lost Account',
             button: (
               <RestoreAccount
                 onClick={handleRestoreAccount}

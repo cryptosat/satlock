@@ -27,6 +27,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return showGuardianKey(origin);
     default:
       throw new Error('Method not found.');
+    case 'restoreAccount':
+      return restoreAccount(origin);
   }
 };
 
@@ -202,6 +204,53 @@ async function showGuardianKey(origin: string) {
       content: panel([text(`${pubKey}`)]),
     },
   });
+
+  if (!guardianKey) {
+    console.log('Recovery cancelled');
+    return false;
+  }
+  return true;
+}
+
+async function restoreAccount(origin: string) {
+  const newPubKey = await getPublicKey();
+
+  const lostKey = await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'alert',
+      content: panel([
+        text('No worries! Your friendly Satellite is here!'),
+        text('Ask your guardians to release start the recovery process'),
+        text('Ask them to input this recovery address, when prompted:'),
+        text(`${newPubKey}`),
+      ]),
+    },
+  });
+  const dataToSend = {
+    old_loser_address: lostKey,
+  };
+
+  try {
+    const response = await fetch(`${CRYPTOSAT_API_HOST}/recoverkey`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(dataToSend),
+    });
+
+    if (response.ok) {
+      const jsonResponse = await response.json();
+      console.log('API response:', jsonResponse);
+    } else {
+      console.error(
+        `Failed to fetch: ${response.status} ${response.statusText}`,
+      );
+    }
+  } catch (error) {
+    console.error('Error occurred while making the API call:', error);
+  }
 
   if (!guardianKey) {
     console.log('Recovery cancelled');
