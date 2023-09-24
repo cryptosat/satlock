@@ -1,5 +1,7 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable jsdoc/require-jsdoc */
 import { secp256k1 } from 'ethereum-cryptography/secp256k1';
+import { sha256 } from 'ethereum-cryptography/sha256';
 import { keccak256 } from 'ethereum-cryptography/keccak';
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { panel, text } from '@metamask/snaps-ui';
@@ -141,13 +143,19 @@ async function handleBackupAccount() {
   return true;
 }
 
+function computeHashBase64(msg: string) {
+  const hash: Uint8Array = sha256(new Uint8Array(Buffer.from(msg).buffer));
+  return Buffer.from(hash).toString('base64');
+}
+
 async function callGuardianApprove(
   oldLoserAddress: string,
   guardianPublicKey: string,
   newLoserAddress: string,
 ) {
-  // const concatData = oldLoserAddress + guardianPublicKey + newLoserAddress;
-  const hash = 'fakehash';
+  const msg = oldLoserAddress + guardianPublicKey + newLoserAddress;
+  const hash = computeHashBase64(msg);
+  console.log(`Data hash: ${hash}`);
 
   // Package the parameters into a data object
   const dataToSend = {
