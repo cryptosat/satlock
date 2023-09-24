@@ -193,7 +193,7 @@ const Index = () => {
             content={{
               title: 'Connect',
               description:
-                'Get started by connecting to and installing the Cryptosat Wallet Recovery Assistant snap.',
+                'Get started by connecting to Metamask and installing the Cryptosat Wallet Recovery Assistant snap.',
               button: (
                 <ConnectButton
                   onClick={handleConnectClick}
