@@ -57,10 +57,10 @@ async function handleBackupAccount(origin: string) {
     return false;
   }
   const guardians: string[] = []; 
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 2; i++) {
       guardians[i] = await snap.request({
           method: 'snap_dialog',
-          params: {
+      params: {
               type: 'prompt',
               content: panel([text(`Provide the public key of guardian ${i}`)]),
               placeholder: '0x123...',
