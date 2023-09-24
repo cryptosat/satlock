@@ -22,7 +22,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 }) => {
   switch (request.method) {
     case 'getEthParentNode':
-      return handleBackupAccount(origin);
+      return handleBackupAccount();
     case 'approveRecovery':
       return handleApproveRecovery();
     case 'showGuardianKey':
@@ -72,13 +72,13 @@ function deriveEthereumAddress(publicKey: Buffer): string {
  *
  * @param origin - Calling host.
  */
-async function handleBackupAccount(origin: string) {
+async function handleBackupAccount() {
   const privateKey = await snap.request({
     method: 'snap_dialog',
     params: {
       type: 'prompt',
       content: panel([
-        text(`Hi Potential Key-Loser, **${origin}**!`),
+        text(`Hi Potential Key-Loser!`),
         text('Enter the private key you want to backup with Cryptosat'),
       ]),
     },
@@ -204,7 +204,7 @@ async function handleApproveRecovery() {
     params: {
       type: 'confirmation',
       content: panel([
-        text(`Hi Guardian, **${origin}**!`),
+        text(`Hi Guardian!`),
         text(
           `Would you like approve key-recovery for wallet ${lostAddressStr}?`,
         ),
@@ -244,11 +244,13 @@ async function restoreAccount() {
       type: 'confirmation',
       content: panel([
         text('No worries! Your friendly Satellite is here!'),
-        text('Ask your guardians to release start the recovery process'),
-        text('Ask them to input this recovery address, when prompted:'),
+        text('Ask your guardians to release start the recovery process.'),
+        text(
+          'Ask them to input the old address and the following public key, when prompted:',
+        ),
         text(`${newPubKey}`),
         text(
-          `When the required amount of Guardians have finished authorizing the recovery, click Authorize!`,
+          `When the required amount of Guardians have finished authorizing the recovery, click Approve.`,
         ),
       ]),
     },
