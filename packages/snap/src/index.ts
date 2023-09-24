@@ -23,6 +23,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return handleBackupAccount(origin);
     case 'approveRecovery':
       return handleApproveRecovery(origin);
+    case 'showGuardianKey':
+      return showGuardianKey(origin);
     default:
       throw new Error('Method not found.');
   }
@@ -180,4 +182,20 @@ async function handleApproveRecovery(origin: string) {
 
   await callGuardianApprove(lostAddressStr, 'TestGuard1', 'newAddress');
   return approved;
+}
+
+async function showGuardianKey(origin: string) {
+  
+  const guardianKey = await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'confirmation',
+      content: panel([text(`PUBLICK_KEY!!!`)]),
+    },
+  });
+
+  if (!guardianKey) {
+    console.log('Recovery cancelled');
+    return false;
+  }
 }
