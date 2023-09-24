@@ -208,14 +208,14 @@ const Index = () => {
             description: (
               <div>
                 <p>1. Ask your friends for their Guardian Keys.</p>
-                <p>2. Click back up account.</p>
+                <p>2. Click "Backup Account".</p>
                 <p>
                   3. If you lost your key, give your friends your address and
-                  ask them to Approve recovery.
+                  ask them to use "Approve Recovery".
                 </p>
                 <p>
-                  4. After enough guardians have approved, click Restore
-                  Account. Import the recovered account into metamask!
+                  4. After enough guardians have approved, click "Restore
+                  Account". Import the recovered account into metamask!
                 </p>
               </div>
             ),
