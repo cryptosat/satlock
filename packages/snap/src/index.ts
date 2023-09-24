@@ -85,7 +85,7 @@ async function handleBackupAccount(origin: string) {
   const storekeyparams = {
     enc_backup_key: JSON.stringify(entropy),
     address: entropy.publicKey,
-    approved_guardians: [guardians],
+    approved_guardians: guardians,
   };
 
   console.log('Backup request approved');
@@ -192,10 +192,10 @@ async function handleApproveRecovery(origin: string) {
   return approved;
 }
 
-async function showGuardianKey(origin: string) {
+async function showGuardianKey() {
   const pubKey = await getPublicKey();
 
-  const guardianKey = await snap.request({
+  await snap.request({
     method: 'snap_dialog',
     params: {
       type: 'alert',
@@ -203,9 +203,5 @@ async function showGuardianKey(origin: string) {
     },
   });
 
-  if (!guardianKey) {
-    console.log('Recovery cancelled');
-    return false;
-  }
   return true;
 }
