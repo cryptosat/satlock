@@ -16,7 +16,8 @@ import {
   SendHelloButton,
   Card,
   ApproveRecoveryButton,
-  ShowGuardianKey
+  ShowGuardianKey,
+  RestoreAccount,
 } from '../components';
 import { defaultSnapOrigin } from '../config';
 
@@ -153,13 +154,22 @@ const Index = () => {
     }
   };
 
+  const handleRestoreAccount = async () => {
+    try {
+      await snapFunc('restoreAccount');
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
   return (
     <Container>
       <Heading>
         <Span>Cryptosat Wallet Recovery Service</Span>
       </Heading>
       <Subtitle>
-        Get started by connecting your Metamask wallet and creating recovery shares of your seed phrase.
+        Get started by connecting your Metamask wallet and creating recovery
+        shares of your seed phrase.
       </Subtitle>
       <CardContainer>
         {state.error && (
@@ -217,6 +227,42 @@ const Index = () => {
             button: (
               <SendHelloButton
                 onClick={handleSendHelloClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            isMetaMaskReady &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'Backup Account',
+            description: 'Backup account with Cryptosat.',
+            button: (
+              <SendHelloButton
+                onClick={handleSendHelloClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            isMetaMaskReady &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'Restore Account',
+            description: 'Backup account with Cryptosat.',
+            button: (
+              <RestoreAccount
+                onClick={handleRestoreAccount}
                 disabled={!state.installedSnap}
               />
             ),

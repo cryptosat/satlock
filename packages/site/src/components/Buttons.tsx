@@ -106,6 +106,10 @@ export const ShowGuardianKey = (props: ComponentProps<typeof Button>) => {
   return <Button {...props}>Show Guardian Key</Button>;
 };
 
+export const RestoreAccount = (props: ComponentProps<typeof Button>) => {
+  return <Button {...props}>Restore Account</Button>;
+};
+
 export const HeaderButtons = ({
   state,
   onConnectClick,
