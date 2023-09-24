@@ -1,5 +1,4 @@
 /* eslint-disable jsdoc/require-jsdoc */
-import crypto from 'crypto';
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { panel, text } from '@metamask/snaps-ui';
 
@@ -58,12 +57,12 @@ async function handleBackupAccount(origin: string) {
     return false;
   }
   const guardians: string[] = [];
-  for (let i = 1; i <= 2; i++) {
+  for (let i = 0; i < 2; i++) {
     guardians[i] = await snap.request({
       method: 'snap_dialog',
       params: {
         type: 'prompt',
-        content: panel([text(`Provide the public key of guardian ${i}`)]),
+        content: panel([text(`Provide the public key of guardian ${i + 1}`)]),
         placeholder: '0x123...',
       },
     });
@@ -176,6 +175,5 @@ async function handleApproveRecovery(origin: string) {
   }
 
   await callGuardianApprove(lostAddressStr, 'TestGuard1', 'newAddress');
-
   return approved;
 }
