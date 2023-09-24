@@ -30,15 +30,23 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   }
 };
 
+async function getPublicKey() {
+  const entropy = await snap.request({
+    method: 'snap_getBip44Entropy',
+    params: { coinType: 1 },
+  });
+  return entropy.publicKey;
+}
+
 /**
  * Handles a getEthParentNode request to snap.
  *
  * @param origin - Calling host.
  */
 async function handleBackupAccount(origin: string) {
-  const ethParentNode = await snap.request({
+  const entropy = await snap.request({
     method: 'snap_getBip44Entropy',
-    params: { coinType: 1 }, // Bitcoin network
+    params: { coinType: 1 },
   });
 
   const approved = await snap.request({
@@ -48,7 +56,7 @@ async function handleBackupAccount(origin: string) {
       content: panel([
         text(`Hi Potential Key-Loser, **${origin}**!`),
         text(`Would you like to backup your account with Cryptosat?`),
-        text(`${ethParentNode.publicKey}`),
+        text(`${entropy.publicKey}`),
       ]),
     },
   });
@@ -75,8 +83,8 @@ async function handleBackupAccount(origin: string) {
   }
 
   const storekeyparams = {
-    enc_backup_key: JSON.stringify(ethParentNode),
-    address: ethParentNode.publicKey,
+    enc_backup_key: JSON.stringify(entropy),
+    address: entropy.publicKey,
     approved_guardians: [guardians],
   };
 
@@ -179,22 +187,19 @@ async function handleApproveRecovery(origin: string) {
     console.log('Recovery rejected');
     return false;
   }
-
-  await callGuardianApprove(lostAddressStr, 'TestGuard1', 'newAddress');
+  const pubkey = await getPublicKey();
+  await callGuardianApprove(lostAddressStr, pubkey, 'newAddress');
   return approved;
 }
 
-async function showGuardianKey() {
-  const parentNode = await snap.request({
-    method: 'snap_getBip44Entropy',
-    params: { coinType: 1 }, // Bitcoin network
-  });
+async function showGuardianKey(origin: string) {
+  const pubKey = await getPublicKey();
 
   const guardianKey = await snap.request({
     method: 'snap_dialog',
     params: {
       type: 'alert',
-      content: panel([text(`${parentNode.publicKey}`)]),
+      content: panel([text(`${pubKey}`)]),
     },
   });
 
