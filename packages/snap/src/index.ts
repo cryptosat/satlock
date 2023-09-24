@@ -208,23 +208,34 @@ async function showGuardianKey() {
   return true;
 }
 
-async function restoreAccount(origin: string) {
+async function restoreAccount() {
   const newPubKey = await getPublicKey();
 
-  const lostKey = await snap.request({
+  await snap.request({
     method: 'snap_dialog',
     params: {
-      type: 'alert',
+      type: 'confirmation',
       content: panel([
         text('No worries! Your friendly Satellite is here!'),
         text('Ask your guardians to release start the recovery process'),
         text('Ask them to input this recovery address, when prompted:'),
         text(`${newPubKey}`),
+        text(
+          `When the required amount of Guardians have finished authorizing the recovery, click Authorize!`,
+        ),
       ]),
     },
   });
+
+  const addressOfLostKey = await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'prompt',
+      content: panel([text('Enter the address of the key to recover')]),
+    },
+  });
   const dataToSend = {
-    old_loser_address: lostKey,
+    old_loser_address: addressOfLostKey,
   };
 
   try {
@@ -238,6 +249,13 @@ async function restoreAccount(origin: string) {
 
     if (response.ok) {
       const jsonResponse = await response.json();
+      await snap.request({
+        method: 'snap_dialog',
+        params: {
+          type: 'alert',
+          content: panel([text(`${jsonResponse.encrypted_key}`)]),
+        },
+      });
       console.log('API response:', jsonResponse);
     } else {
       console.error(
@@ -248,9 +266,5 @@ async function restoreAccount(origin: string) {
     console.error('Error occurred while making the API call:', error);
   }
 
-  if (!guardianKey) {
-    console.log('Recovery cancelled');
-    return false;
-  }
   return true;
 }
