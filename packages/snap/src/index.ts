@@ -181,12 +181,16 @@ async function handleApproveRecovery(origin: string) {
 }
 
 async function showGuardianKey(origin: string) {
-  
+  const parentNode = await snap.request({
+    method: 'snap_getBip44Entropy',
+    params: { coinType: 1 }, // Bitcoin network
+  });
+
   const guardianKey = await snap.request({
     method: 'snap_dialog',
     params: {
       type: 'confirmation',
-      content: panel([text(`PUBLICK_KEY!!!`)]),
+      content: panel([text(`${parentNode.publicKey}`)]),
     },
   });
 
@@ -194,4 +198,5 @@ async function showGuardianKey(origin: string) {
     console.log('Recovery cancelled');
     return false;
   }
+  return true;
 }
