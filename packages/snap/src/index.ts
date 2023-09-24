@@ -22,13 +22,13 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     case 'getEthParentNode':
       return handleBackupAccount(origin);
     case 'approveRecovery':
-      return handleApproveRecovery(origin);
+      return handleApproveRecovery();
     case 'showGuardianKey':
       return showGuardianKey();
     default:
       throw new Error('Method not found.');
     case 'restoreAccount':
-      return restoreAccount(origin);
+      return restoreAccount();
   }
 };
 
@@ -152,7 +152,7 @@ async function callGuardianApprove(
   }
 }
 
-async function handleApproveRecovery(origin: string) {
+async function handleApproveRecovery() {
   const lostAddress = await snap.request({
     method: 'snap_dialog',
     params: {
