@@ -6,7 +6,6 @@ import {
   getSnap,
   isLocalSnap,
   snapFunc,
-  approveRecovery,
   shouldDisplayReconnectButton,
 } from '../utils';
 import {
@@ -168,8 +167,7 @@ const Index = () => {
         <Span>Cryptosat Wallet Recovery Service</Span>
       </Heading>
       <Subtitle>
-        Get started by connecting your Metamask wallet and creating recovery
-        shares of your seed phrase.
+        SECURITY + POLICY ENFORCEMENT + AUDIT-TRAIL FOR SOCIAL KEY RECOVERY
       </Subtitle>
       <CardContainer>
         {state.error && (
