@@ -1,3 +1,4 @@
+/* eslint-disable jsdoc/require-jsdoc */
 import crypto from 'crypto';
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { panel, text } from '@metamask/snaps-ui';
@@ -96,13 +97,23 @@ async function handleBackupAccount(origin: string) {
   return true;
 }
 
+async function hashData(data: string) {
+  const msgBuffer = new TextEncoder().encode(data);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+  return hashHex;
+}
+
 async function callGuardianApprove(
   oldLoserAddress: string,
   guardianPublicKey: string,
   newLoserAddress: string,
 ) {
   const concatData = oldLoserAddress + guardianPublicKey + newLoserAddress;
-  const hash = crypto.createHash('sha256').update(concatData).digest('hex');
+  const hash = await hashData(concatData);
 
   // Package the parameters into a data object
   const dataToSend = {
@@ -134,11 +145,6 @@ async function callGuardianApprove(
   }
 }
 
-/**
- * Handle recovery approval.
- *
- * @param origin - Caller origin.
- */
 async function handleApproveRecovery(origin: string) {
   const lostAddress = await snap.request({
     method: 'snap_dialog',
@@ -177,7 +183,7 @@ async function handleApproveRecovery(origin: string) {
     return false;
   }
 
-  callGuardianApprove(lostAddressStr, 'TestGuard1', 'newAddress');
+  await callGuardianApprove(lostAddressStr, 'TestGuard1', 'newAddress');
 
   return approved;
 }
