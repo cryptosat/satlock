@@ -102,6 +102,10 @@ export const ApproveRecoveryButton = (props: ComponentProps<typeof Button>) => {
   return <Button {...props}>Approve Recovery</Button>;
 };
 
+export const ShowGuardianKey = (props: ComponentProps<typeof Button>) => {
+  return <Button {...props}>Show Guardian Key</Button>;
+};
+
 export const HeaderButtons = ({
   state,
   onConnectClick,

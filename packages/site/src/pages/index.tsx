@@ -16,6 +16,7 @@ import {
   SendHelloButton,
   Card,
   ApproveRecoveryButton,
+  ShowGuardianKey
 } from '../components';
 import { defaultSnapOrigin } from '../config';
 
@@ -143,6 +144,15 @@ const Index = () => {
     }
   };
 
+  const handleShowGuardianKey = async () => {
+    try {
+      await snapFunc('showGuardianKey');
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
   return (
     <Container>
       <Heading>
@@ -207,6 +217,24 @@ const Index = () => {
             button: (
               <SendHelloButton
                 onClick={handleSendHelloClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            isMetaMaskReady &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'Show Your Guardian Key',
+            description: 'Show your Guardian key to give to friends',
+            button: (
+              <ShowGuardianKey
+                onClick={handleShowGuardianKey}
                 disabled={!state.installedSnap}
               />
             ),
