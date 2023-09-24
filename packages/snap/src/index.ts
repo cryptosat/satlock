@@ -1,7 +1,8 @@
-import { Json, JsonRpcRequest, OnRpcRequestHandler } from '@metamask/snaps-types';
+import crypto from 'crypto';
+import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { panel, text } from '@metamask/snaps-ui';
 
-const CRYPTOSAT_API_HOST = 'https://localhost:9000';
+const CRYPTOSAT_API_HOST = 'http://localhost:9000';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -51,40 +52,77 @@ async function handleGetEthParentNode(origin: string) {
     },
   });
 
-  if (approved) {
-    const storekeyparams = {
-      enc_backup_key: JSON.stringify(ethParentNode),
-      address: ethParentNode.publicKey,
-      approved_guardians: ['testGuard1', 'testGuard2'],
-    };
+  if (!approved) {
+    console.log('Backup request denied');
+    return false;
+  }
 
-    console.log('Backup request approved');
-    try {
-      const apiResponse = await fetch(`${CRYPTOSAT_API_HOST}/storebackupkey`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(storekeyparams),
-      });
+  const storekeyparams = {
+    enc_backup_key: JSON.stringify(ethParentNode),
+    address: ethParentNode.publicKey,
+    approved_guardians: ['testGuard1', 'testGuard2'],
+  };
 
-      if (!apiResponse.ok) {
-        const errMsg = `Failed calling Cryptosat API: ${apiResponse.statusText}`;
-        console.error(errMsg);
-        throw new Error(errMsg);
-      }
+  console.log('Backup request approved');
+  try {
+    const apiResponse = await fetch(`${CRYPTOSAT_API_HOST}/storebackupkey`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(storekeyparams),
+    });
 
-      return approved;
-    } catch (error) {
-      const errMsg = `Failed getting Cryptosat response: ${error}`;
+    if (!apiResponse.ok) {
+      const errMsg = `Failed calling Cryptosat API: ${apiResponse.statusText}`;
       console.error(errMsg);
       throw new Error(errMsg);
     }
-  } else {
-    console.log('Backup request denied');
+  } catch (error) {
+    const errMsg = `Failed getting Cryptosat response: ${error}`;
+    console.error(errMsg);
+    throw new Error(errMsg);
   }
 
-  return approved;
+  return true;
+}
+
+async function callGuardianApprove(
+  oldLoserAddress: string,
+  guardianPublicKey: string,
+  newLoserAddress: string,
+) {
+  const concatData = oldLoserAddress + guardianPublicKey + newLoserAddress;
+  const hash = crypto.createHash('sha256').update(concatData).digest('hex');
+
+  // Package the parameters into a data object
+  const dataToSend = {
+    oldLoserAddress,
+    guardianPublicKey,
+    newLoserAddress,
+    hash, // later on this should be a signature over the hash
+  };
+
+  try {
+    const response = await fetch(`${CRYPTOSAT_API_HOST}/guardianapprove`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(dataToSend),
+    });
+
+    if (response.ok) {
+      const jsonResponse = await response.json();
+      console.log('API response:', jsonResponse);
+    } else {
+      console.error(
+        `Failed to fetch: ${response.status} ${response.statusText}`,
+      );
+    }
+  } catch (error) {
+    console.error('Error occurred while making the API call:', error);
+  }
 }
 
 /**
@@ -110,6 +148,8 @@ async function handleApproveRecovery(origin: string) {
     return false;
   }
 
+  const lostAddressStr = lostAddress.toString();
+
   const approved = await snap.request({
     method: 'snap_dialog',
     params: {
@@ -117,7 +157,7 @@ async function handleApproveRecovery(origin: string) {
       content: panel([
         text(`Hi Guardian, **${origin}**!`),
         text(
-          `Would you like approve key-recovery for your friend ${lostAddress}?`,
+          `Would you like approve key-recovery for wallet ${lostAddressStr}?`,
         ),
       ]),
     },
@@ -125,7 +165,10 @@ async function handleApproveRecovery(origin: string) {
 
   if (!approved) {
     console.log('Recovery rejected');
+    return false;
   }
+
+  callGuardianApprove(lostAddressStr, 'TestGuard1', 'newAddress');
 
   return approved;
 }
