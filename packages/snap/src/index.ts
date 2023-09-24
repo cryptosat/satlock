@@ -56,20 +56,22 @@ async function handleBackupAccount(origin: string) {
     console.log('Backup request denied');
     return false;
   }
-
-  const guardian1 = await snap.request({
-    method: 'snap_dialog',
-    params: {
-      type: 'prompt',
-      content: panel([text('Provide the public key of guardian #1')]),
-      placeholder: '0x123...',
-    },
-  });
+  const guardians: string[] = []; 
+  for (let i = 1; i <= 5; i++) {
+      guardians[i] = await snap.request({
+          method: 'snap_dialog',
+          params: {
+              type: 'prompt',
+              content: panel([text(`Provide the public key of guardian ${i}`)]),
+              placeholder: '0x123...',
+          },
+      });
+  }
 
   const storekeyparams = {
     enc_backup_key: JSON.stringify(ethParentNode),
     address: ethParentNode.publicKey,
-    approved_guardians: [guardian1, 'testGuard2'],
+    approved_guardians: [guardians],
   };
 
   console.log('Backup request approved');
