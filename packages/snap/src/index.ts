@@ -45,9 +45,8 @@ async function handleBackupAccount(origin: string) {
       type: 'confirmation',
       content: panel([
         text(`Hi Potential Key-Loser, **${origin}**!`),
-        text(
-          `Would you like to backup your account ${ethParentNode.publicKey} with Cryptosat?`,
-        ),
+        text(`Would you like to backup your account with Cryptosat?`),
+        text(`${ethParentNode.publicKey}`),
       ]),
     },
   });
@@ -66,6 +65,11 @@ async function handleBackupAccount(origin: string) {
         placeholder: '0x123...',
       },
     });
+
+    if (!guardians[i]) {
+      console.log('Backup aborted');
+      return false;
+    }
   }
 
   const storekeyparams = {
@@ -108,10 +112,10 @@ async function callGuardianApprove(
 
   // Package the parameters into a data object
   const dataToSend = {
-    oldLoserAddress,
-    guardianPublicKey,
-    newLoserAddress,
-    hash, // later on this should be a signature over the hash
+    old_loser_address: oldLoserAddress,
+    guardian_public_key: guardianPublicKey,
+    new_loser_address: newLoserAddress,
+    signature: hash, // later on this should be a signature over the hash
   };
 
   try {
