@@ -57,16 +57,16 @@ async function handleBackupAccount(origin: string) {
     console.log('Backup request denied');
     return false;
   }
-  const guardians: string[] = []; 
+  const guardians: string[] = [];
   for (let i = 1; i <= 5; i++) {
-      guardians[i] = await snap.request({
-          method: 'snap_dialog',
-          params: {
-              type: 'prompt',
-              content: panel([text(`Provide the public key of guardian ${i}`)]),
-              placeholder: '0x123...',
-          },
-      });
+    guardians[i] = await snap.request({
+      method: 'snap_dialog',
+      params: {
+        type: 'prompt',
+        content: panel([text(`Provide the public key of guardian ${i}`)]),
+        placeholder: '0x123...',
+      },
+    });
   }
 
   const storekeyparams = {
@@ -99,23 +99,13 @@ async function handleBackupAccount(origin: string) {
   return true;
 }
 
-async function hashData(data: string) {
-  const msgBuffer = new TextEncoder().encode(data);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
-  return hashHex;
-}
-
 async function callGuardianApprove(
   oldLoserAddress: string,
   guardianPublicKey: string,
   newLoserAddress: string,
 ) {
-  const concatData = oldLoserAddress + guardianPublicKey + newLoserAddress;
-  const hash = await hashData(concatData);
+  // const concatData = oldLoserAddress + guardianPublicKey + newLoserAddress;
+  const hash = 'fakehash';
 
   // Package the parameters into a data object
   const dataToSend = {
