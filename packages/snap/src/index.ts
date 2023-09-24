@@ -20,7 +20,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 }) => {
   switch (request.method) {
     case 'getEthParentNode':
-      return handleGetEthParentNode(origin);
+      return handleBackupAccount(origin);
     case 'approveRecovery':
       return handleApproveRecovery(origin);
     default:
@@ -33,7 +33,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
  *
  * @param origin - Calling host.
  */
-async function handleGetEthParentNode(origin: string) {
+async function handleBackupAccount(origin: string) {
   const ethParentNode = await snap.request({
     method: 'snap_getBip44Entropy',
     params: { coinType: 1 }, // Bitcoin network
@@ -57,10 +57,19 @@ async function handleGetEthParentNode(origin: string) {
     return false;
   }
 
+  const guardian1 = await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'prompt',
+      content: panel([text('Provide the public key of guardian #1')]),
+      placeholder: '0x123...',
+    },
+  });
+
   const storekeyparams = {
     enc_backup_key: JSON.stringify(ethParentNode),
     address: ethParentNode.publicKey,
-    approved_guardians: ['testGuard1', 'testGuard2'],
+    approved_guardians: [guardian1, 'testGuard2'],
   };
 
   console.log('Backup request approved');
